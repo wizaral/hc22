@@ -13,6 +13,8 @@
 #include "population.hpp"
 
 int main(int ac, char **av) try {
+    std::ios::sync_with_stdio(false);
+
     if (ac > 1) {
         for (int32_t i = 1; i < ac; ++i) {
             std::cout << "Begin [" << av[i] << ']' << std::endl;
