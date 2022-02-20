@@ -1,5 +1,11 @@
 #include <iostream>
 
+#if defined(_WIN64) || defined(_WIN32)
+#define EXTENSION ".exe"
+#else
+#define EXTENSION
+#endif
+
 #include "crossover.hpp"
 #include "filter.hpp"
 #include "generator.hpp"
@@ -7,17 +13,21 @@
 #include "population.hpp"
 
 int main(int ac, char **av) try {
-    if (ac == 2) {
-        auto p0 = std::make_unique<Population0>();
+    if (ac > 1) {
+        for (int32_t i = 1; i < ac; ++i) {
+            std::cout << "Begin [" << av[i] << ']' << std::endl;
 
-        p0->set_input_data(av[1])
-            .set_crossover(std::make_unique<Crossover0>())
-            .set_filter(std::make_unique<Filter0>())
-            .set_generator(std::make_unique<Generator0>())
-            .set_mutation(std::make_unique<Mutation0>())
-            .algorithm(200, 200);
+            auto p0 = std::make_unique<Population0>();
+
+            p0->set_input_data(av[i])
+                .set_crossover(std::make_unique<Crossover0>())
+                .set_filter(std::make_unique<Filter0>())
+                .set_generator(std::make_unique<Generator0>())
+                .set_mutation(std::make_unique<Mutation0>())
+                .algorithm(12'000, 10);
+        }
     } else {
-        std::cerr << "Usage: ./pizza [file_name]" << std::endl;
+        std::cerr << "Usage: ./pizza" EXTENSION " [files ...]" << std::endl;
     }
 } catch (std::exception &ex) {
     std::cerr << ex.what() << std::endl;
