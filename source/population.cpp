@@ -100,7 +100,7 @@ void Population::examine() {
     auto shift = size / cores;
 
     for (size_t i = shift; i < size; i += shift) {
-        m_pool.add_task([i, shift, pers = std::ref(m_persons), ents = std::ref(m_entities)]() -> void {
+        m_pool.add_task([i, shift, pers = std::cref(m_persons), ents = std::ref(m_entities)]() -> void {
             for (auto j = i, end = i + shift; j < end; ++j) {
                 ents.get()[j].examine(pers);
             }
@@ -115,8 +115,9 @@ void Population::examine() {
 }
 
 void Population::sort(Entities &entities) {
-    std::sort(
-        entities.begin(), entities.end(), [](const auto &lhs, const auto &rhs) { return lhs.score() > rhs.score(); });
+    std::sort(entities.begin(), entities.end(), [](const auto &lhs, const auto &rhs) {
+        return lhs.score() > rhs.score();
+    });
 }
 
 void Population::print(const Entity &entity) {
@@ -138,20 +139,20 @@ void Population::print(const Entity &entity) {
 void Population0::algorithm(size_t population_amount, size_t iterations) {
     m_entities = m_generator->generate(m_products.size(), population_amount);
 
+    std::cout << "Start" << std::endl;
+
     for (size_t i = 0; i < iterations; ++i, ++m_age) {
         examine();
         sort(m_entities);
 
-        std::cout << "Best: " << m_entities.front().score() << '\n';
+        std::cout << "Age: " << m_age << ". Best: " << m_entities.front().score() << '\n';
         m_filter->filter(m_entities);
 
         auto temp0 = m_crossover->crossover(m_entities);
-        m_entities.insert(
-            m_entities.end(), std::make_move_iterator(temp0.begin()), std::make_move_iterator(temp0.end()));
+        m_entities.insert(m_entities.end(), std::move_iterator(temp0.begin()), std::move_iterator(temp0.end()));
 
         auto temp1 = m_mutation->mutation(m_entities);
-        m_entities.insert(
-            m_entities.end(), std::make_move_iterator(temp1.begin()), std::make_move_iterator(temp1.end()));
+        m_entities.insert(m_entities.end(), std::move_iterator(temp1.begin()), std::move_iterator(temp1.end()));
     }
 
     print(m_entities.front());
