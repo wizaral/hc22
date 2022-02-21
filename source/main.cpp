@@ -1,6 +1,7 @@
 #include <iostream>
 
 #if defined(_WIN64) || defined(_WIN32)
+#include <windows.h>
 #define EXTENSION ".exe"
 #else
 #define EXTENSION
@@ -12,6 +13,9 @@
 #include "population.hpp"
 
 int main(int ac, char **av) try {
+#if defined(_WIN64) || defined(_WIN32)
+    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+#endif
     std::ios::sync_with_stdio(false);
 
     if (ac > 1) {
