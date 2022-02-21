@@ -146,13 +146,10 @@ void Population0::algorithm(size_t population_amount, size_t iterations) {
         sort(m_entities);
 
         std::cout << "Age: " << m_age << ". Best: " << m_entities.front().score() << '\n';
+
         m_filter->filter(m_entities);
-
-        auto temp0 = m_crossover->crossover(m_entities);
-        m_entities.insert(m_entities.end(), std::move_iterator(temp0.begin()), std::move_iterator(temp0.end()));
-
-        auto temp1 = m_mutation->mutation(m_entities);
-        m_entities.insert(m_entities.end(), std::move_iterator(temp1.begin()), std::move_iterator(temp1.end()));
+        m_crossover->crossover(m_entities);
+        m_mutation->mutation(m_entities);
     }
 
     print(m_entities.front());
