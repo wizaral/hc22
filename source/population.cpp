@@ -18,55 +18,17 @@ const Entities &Population::entities() const {
 }
 
 Population &Population::set_input_data(const char *file) {
-    m_file = file;
-
-    if (auto pos = m_file.rfind('.'); pos != std::string::npos) {
-        m_file.replace(std::next(m_file.begin(), pos), m_file.end(), ".out");
-    } else {
-        m_file.append("_out");
-    }
-
-    if (auto pos = m_file.rfind("input/"); pos != std::string::npos) {
-        m_file.replace(std::next(m_file.begin(), pos), std::next(m_file.begin(), pos + 2), "out");
-    }
+    m_file = generate_output_file_name(file);
 
     if (std::ifstream ifile(file); ifile) {
         size_t amount, id = 0;
-        std::string str;
 
         ifile >> amount;
         m_persons.resize(amount);
 
         for (auto &person : m_persons) {
-            ifile >> amount;
-
-            for (size_t i = 0; i < amount; ++i) {
-                ifile >> str;
-
-                auto [it, res] = m_products_ids.insert({str, id});
-                if (res) {
-                    person.favorite[i] = id;
-                    m_products.emplace_back(it->first);
-                    ++id;
-                } else {
-                    person.favorite[i] = it->second;
-                }
-            }
-
-            ifile >> amount;
-
-            for (size_t i = 0; i < amount; ++i) {
-                ifile >> str;
-
-                auto [it, res] = m_products_ids.insert({str, id});
-                if (res) {
-                    person.disliked[i] = id;
-                    m_products.emplace_back(it->first);
-                    ++id;
-                } else {
-                    person.disliked[i] = it->second;
-                }
-            }
+            read_products(ifile, person.favorite, id);
+            read_products(ifile, person.disliked, id);
         }
     } else {
         throw std::invalid_argument("Wrong file name");
@@ -114,12 +76,6 @@ void Population::examine() {
     m_pool.wait();
 }
 
-void Population::sort(Entities &entities) {
-    std::sort(entities.begin(), entities.end(), [](const auto &lhs, const auto &rhs) {
-        return lhs.score() > rhs.score();
-    });
-}
-
 void Population::print(const Entity &entity) {
     std::cout << "Score: " << entity.score() << '\n';
 
@@ -132,6 +88,46 @@ void Population::print(const Entity &entity) {
             }
         }
     }
+}
+
+void Population::read_products(std::ifstream &file, std::array<int64_t, max_person_items> &products_list, size_t &id) {
+    std::string str;
+    size_t amount;
+    file >> amount;
+
+    for (size_t i = 0; i < amount; ++i) {
+        file >> str;
+
+        auto [it, res] = m_products_ids.insert({str, id});
+        if (res) {
+            products_list[i] = id;
+            m_products.emplace_back(it->first);
+            ++id;
+        } else {
+            products_list[i] = it->second;
+        }
+    }
+}
+
+void Population::sort(Entities &entities) {
+    std::sort(entities.begin(), entities.end(), [](const auto &lhs, const auto &rhs) {
+        return lhs.score() > rhs.score();
+    });
+}
+
+std::string Population::generate_output_file_name(const char *name) {
+    std::string file(name);
+
+    if (auto pos = file.rfind('.'); pos != std::string::npos) {
+        file.replace(std::next(file.begin(), pos), file.end(), ".out");
+    } else {
+        file.append("_out");
+    }
+
+    if (auto pos = file.rfind("input/"); pos != std::string::npos) {
+        file.replace(std::next(file.begin(), pos), std::next(file.begin(), pos + 2), "out");
+    }
+    return file;
 }
 
 // ================================================================================================================== //

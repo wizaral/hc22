@@ -46,8 +46,10 @@ public:
 protected:
     void examine();
     void print(const Entity &entity);
+    void read_products(std::ifstream &file, std::array<int64_t, max_person_items> &products_list, size_t &id);
 
     static void sort(Entities &entities);
+    static std::string generate_output_file_name(const char *name);
 };
 
 class Population0 : public Population {
