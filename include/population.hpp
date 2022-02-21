@@ -17,7 +17,6 @@ protected:
     std::unique_ptr<class Crossover> m_crossover;
     std::unique_ptr<class Generator> m_generator;
     std::unique_ptr<class Mutation> m_mutation;
-    std::unique_ptr<class Filter> m_filter;
 
     std::string m_file;
     Persons m_persons;
@@ -39,7 +38,6 @@ public:
     Population &set_crossover(std::unique_ptr<Crossover> crossover);
     Population &set_generator(std::unique_ptr<Generator> generator);
     Population &set_mutation(std::unique_ptr<Mutation> mutation);
-    Population &set_filter(std::unique_ptr<Filter> filter);
 
     virtual void algorithm(size_t population_amount, size_t iterations) = 0;
 

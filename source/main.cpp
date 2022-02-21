@@ -7,7 +7,6 @@
 #endif
 
 #include "crossover.hpp"
-#include "filter.hpp"
 #include "generator.hpp"
 #include "mutation.hpp"
 #include "population.hpp"
@@ -23,7 +22,6 @@ int main(int ac, char **av) try {
 
             p0->set_input_data(av[i])
                 .set_crossover(std::make_unique<Crossover0>())
-                .set_filter(std::make_unique<Filter0>())
                 .set_generator(std::make_unique<Generator0>())
                 .set_mutation(std::make_unique<Mutation0>())
                 .algorithm(12'000, 10);

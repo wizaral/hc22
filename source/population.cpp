@@ -5,7 +5,6 @@
 #include "population.hpp"
 
 #include "crossover.hpp"
-#include "filter.hpp"
 #include "generator.hpp"
 #include "mutation.hpp"
 
@@ -49,11 +48,6 @@ Population &Population::set_generator(std::unique_ptr<Generator> generator) {
 
 Population &Population::set_mutation(std::unique_ptr<Mutation> mutation) {
     m_mutation = std::move(mutation);
-    return *this;
-}
-
-Population &Population::set_filter(std::unique_ptr<Filter> filter) {
-    m_filter = std::move(filter);
     return *this;
 }
 
@@ -143,7 +137,6 @@ void Population0::algorithm(size_t population_amount, size_t iterations) {
 
         std::cout << "Age: " << m_age << ". Best: " << m_entities.front().score() << '\n';
 
-        m_filter->filter(m_entities);
         m_crossover->crossover(m_entities);
         m_mutation->mutation(m_entities);
     }
