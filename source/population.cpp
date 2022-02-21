@@ -144,6 +144,12 @@ void Population0::algorithm(size_t population_amount, size_t iterations) {
         {
             LOG_DURATION("Crossover");
 
+            std::copy(
+                m_entities.begin(),
+                std::next(m_entities.begin(), m_entities.size() / 4),
+                std::next(m_entities.begin(), m_entities.size() / 4)
+            );
+
             m_crossover->crossover(
                 std::next(m_entities.begin(), m_entities.size() / 4),
                 std::next(m_entities.begin(), m_entities.size() / 2),
@@ -154,6 +160,11 @@ void Population0::algorithm(size_t population_amount, size_t iterations) {
         {
             LOG_DURATION("Mutation");
 
+            std::copy(
+                m_entities.begin(),
+                std::next(m_entities.begin(), m_entities.size() / 2),
+                std::next(m_entities.begin(), m_entities.size() / 2)
+            );
 
             m_mutation->mutation(
                 std::next(m_entities.begin(), m_entities.size() / 2),
