@@ -20,6 +20,8 @@ public:
 
     int score() const;
     void examine(const Persons &persons);
+
+    friend void swap(Entity &a, Entity &b);
 };
 
 using Entities = std::vector<Entity>;

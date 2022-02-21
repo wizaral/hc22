@@ -22,3 +22,8 @@ void Entity::examine(const Persons &persons) {
         }
     }
 }
+
+void swap(Entity &a, Entity &b) {
+    std::swap_ranges(a.products.begin, a.products.end, b.products.begin);
+    std::swap(a.m_score, b.m_score);
+}
