@@ -30,6 +30,29 @@ Population &Population::set_input_data(const char *file) {
             read_products(ifile, person.favorite, id);
             read_products(ifile, person.disliked, id);
         }
+#if 0
+        for (auto i : m_products) {
+            std::cout << i << ' ';
+        }
+        std::cout << '\n';
+
+        for (auto &[k, v] : m_products_ids) {
+            std::cout << k << ':' << v << ' ';
+        }
+        std::cout << '\n';
+
+        for (auto &i : m_persons) {
+            for (auto j : i.favorite) {
+                std::cout << m_products[j] << ' ';
+            }
+            std::cout << '\n';
+
+            for (auto j : i.disliked) {
+                std::cout << m_products[j] << ' ';
+            }
+            std::cout << '\n';
+        }
+#endif
     } else {
         throw std::invalid_argument("Wrong file name");
     }
