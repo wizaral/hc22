@@ -3,10 +3,12 @@
 #include <map>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #define THREAD_POOL_WAIT
 
 #include "entity.hpp"
+#include "memory_pool.hpp"
 #include "thread_pool.hpp"
 
 class Population {
@@ -19,12 +21,14 @@ protected:
     std::unique_ptr<class Mutation> m_mutation;
 
     std::string m_file;
+
     Persons m_persons;
+    MemoryPool<bool> m_memory_pool;
 
     std::vector<std::string_view> m_products;
     std::map<std::string, int32_t> m_products_ids;
 
-    al::ThreadPool m_pool{cores - 1};
+    al::ThreadPool m_thread_pool{cores - 1};
     inline static const auto cores = std::thread::hardware_concurrency();
 
 public:

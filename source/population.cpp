@@ -56,7 +56,7 @@ void Population::examine() {
     auto shift = size / cores;
 
     for (size_t i = shift; i < size; i += shift) {
-        m_pool.add_task([i, shift, pers = std::cref(m_persons), ents = std::ref(m_entities)]() -> void {
+        m_thread_pool.add_task([i, shift, pers = std::cref(m_persons), ents = std::ref(m_entities)]() -> void {
             for (auto j = i, end = i + shift; j < end; ++j) {
                 ents.get()[j].examine(pers);
             }
@@ -67,17 +67,17 @@ void Population::examine() {
         m_entities[i].examine(m_persons);
     }
 
-    m_pool.wait();
+    m_thread_pool.wait();
 }
 
 void Population::print(const Entity &entity) {
     std::cout << "Score: " << entity.score() << '\n';
 
     if (std::ofstream ofile(m_file); ofile) {
-        ofile << std::accumulate(entity.products.begin(), entity.products.end(), 0);
+        ofile << std::accumulate(entity.products.begin, entity.products.end, 0);
 
         for (size_t i = 0, size = m_products.size(); i < size; ++i) {
-            if (entity.products[i]) {
+            if (*std::next(entity.products.begin, i)) {
                 ofile << ' ' << m_products[i];
             }
         }
@@ -127,7 +127,10 @@ std::string Population::generate_output_file_name(const char *name) {
 // ================================================================================================================== //
 
 void Population0::algorithm(size_t population_amount, size_t iterations) {
-    m_entities = m_generator->generate(m_products.size(), population_amount);
+    m_memory_pool.pool.resize(m_products.size() * population_amount);
+    m_memory_pool.optional_size = population_amount;
+
+    m_entities = m_generator->generate(m_memory_pool, m_products.size(), population_amount);
 
     std::cout << "Start" << std::endl;
 
@@ -137,8 +140,16 @@ void Population0::algorithm(size_t population_amount, size_t iterations) {
 
         std::cout << "Age: " << m_age << ". Best: " << m_entities.front().score() << '\n';
 
-        m_crossover->crossover(m_entities);
-        m_mutation->mutation(m_entities);
+        m_crossover->crossover(
+            std::next(m_entities.begin(), m_entities.size() / 4),
+            std::next(m_entities.begin(), m_entities.size() / 2),
+            {m_products.size() / 2}
+        );
+
+        m_mutation->mutation(
+            std::next(m_entities.begin(), m_entities.size() / 2),
+            m_entities.end(),
+            {});
     }
 
     print(m_entities.front());

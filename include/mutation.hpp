@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <chrono>
 #include <random>
 
@@ -8,17 +9,11 @@
 struct Mutation {
     virtual ~Mutation() = default;
 
-    virtual void mutation(Entities &entities) = 0;
-    virtual Entities mutation(const Entities &entities) = 0;
+    virtual void mutation(Entities::iterator begin, Entities::iterator end, std::any any) = 0;
 };
 
 struct Mutation0 : Mutation {
     std::mt19937 mt{std::mt19937(std::chrono::steady_clock::now().time_since_epoch().count())};
 
-    void mutation(Entities &entities) override;
-    Entities mutation(const Entities &entities) override;
+    void mutation(Entities::iterator begin, Entities::iterator end, std::any any) override;
 };
-
-// struct Mutation1 : Mutation0 {
-//     Entities mutation(const Entities &entities) override;
-// };
