@@ -7,6 +7,7 @@
 #include "crossover.hpp"
 #include "generator.hpp"
 #include "mutation.hpp"
+#include "profiler.hpp"
 
 Entities &Population::entities() {
     return m_entities;
@@ -140,16 +141,25 @@ void Population0::algorithm(size_t population_amount, size_t iterations) {
 
         std::cout << "Age: " << m_age << ". Best: " << m_entities.front().score() << '\n';
 
-        m_crossover->crossover(
-            std::next(m_entities.begin(), m_entities.size() / 4),
-            std::next(m_entities.begin(), m_entities.size() / 2),
-            {m_products.size() / 2}
-        );
+        {
+            LOG_DURATION("Crossover");
 
-        m_mutation->mutation(
-            std::next(m_entities.begin(), m_entities.size() / 2),
-            m_entities.end(),
-            {});
+            m_crossover->crossover(
+                std::next(m_entities.begin(), m_entities.size() / 4),
+                std::next(m_entities.begin(), m_entities.size() / 2),
+                {m_products.size() / 2}
+            );
+        }
+
+        {
+            LOG_DURATION("Mutation");
+
+
+            m_mutation->mutation(
+                std::next(m_entities.begin(), m_entities.size() / 2),
+                m_entities.end(),
+                {});
+        }
     }
 
     print(m_entities.front());

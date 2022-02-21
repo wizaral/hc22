@@ -11,6 +11,7 @@
 #include "generator.hpp"
 #include "mutation.hpp"
 #include "population.hpp"
+#include "profiler.hpp"
 
 int main(int ac, char **av) try {
 #if defined(_WIN64) || defined(_WIN32)
@@ -19,7 +20,10 @@ int main(int ac, char **av) try {
     std::ios::sync_with_stdio(false);
 
     if (ac > 1) {
+        LOG_DURATION("All");
+
         for (int32_t i = 1; i < ac; ++i) {
+            LOG_DURATION("End [" + std::to_string(i) + ']');
             std::cout << "Begin [" << av[i] << ']' << std::endl;
 
             auto p0 = std::make_unique<Population0>();
