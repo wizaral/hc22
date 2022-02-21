@@ -5,10 +5,10 @@
 #include <string_view>
 #include <vector>
 
-#define THREAD_POOL_WAIT
-
 #include "entity.hpp"
 #include "memory_pool.hpp"
+
+#define THREAD_POOL_WAIT
 #include "thread_pool.hpp"
 
 class Population {
@@ -46,7 +46,7 @@ public:
     virtual void algorithm(size_t population_amount, size_t iterations) = 0;
 
 protected:
-    void examine();
+    virtual void examine() = 0;
     void print(const Entity &entity);
     void read_products(std::ifstream &file, std::array<int64_t, max_person_items> &products_list, size_t &id);
 
@@ -54,7 +54,14 @@ protected:
     static std::string generate_output_file_name(const char *name);
 };
 
-class Population0 : public Population {
+class PopulationSingleCore0 : public Population {
 public:
     void algorithm(size_t population_amount, size_t iterations) override;
+    void examine() override;
+};
+
+class PopulationMultiCore0 : public Population {
+public:
+    void algorithm(size_t population_amount, size_t iterations) override;
+    void examine() override;
 };

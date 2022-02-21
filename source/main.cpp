@@ -26,13 +26,12 @@ int main(int ac, char **av) try {
             LOG_DURATION("End [" + std::to_string(i) + ']');
             std::cout << "Begin [" << av[i] << ']' << std::endl;
 
-            auto p0 = std::make_unique<Population0>();
-
-            p0->set_input_data(av[i])
-                .set_crossover(std::make_unique<Crossover0>())
+            std::make_unique<PopulationMultiCore0>()
+                ->set_input_data(av[i])
+                .set_crossover(std::make_unique<CrossoverMultiCore0>())
                 .set_generator(std::make_unique<Generator0>())
-                .set_mutation(std::make_unique<Mutation0>())
-                .algorithm(12'000, 10);
+                .set_mutation(std::make_unique<MutationSingleCore1>())
+                .algorithm(240'000, 100);
         }
     } else {
         std::cerr << "Usage: ./pizza" EXTENSION " [files ...]" << std::endl;
