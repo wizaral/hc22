@@ -6,7 +6,8 @@
 #include "thread_pool.hpp"
 
 void CrossoverSingleCore0::crossover(Entities::iterator begin, Entities::iterator end, std::any any) {
-    auto half = std::any_cast<size_t>(any) / 2;
+    auto pair = std::any_cast<std::pair<size_t, std::reference_wrapper<al::ThreadPool>>>(any);
+    auto half = pair.first / 2;
 
     for (auto it = begin; it != end; std::advance(it, 2)) {
         std::swap_ranges(it->products.begin, std::next(it->products.begin, half), std::next(it)->products.begin);
@@ -14,8 +15,6 @@ void CrossoverSingleCore0::crossover(Entities::iterator begin, Entities::iterato
 }
 
 // ================================================================================================================== //
-
-#include <iostream>
 
 void CrossoverMultiCore0::crossover(Entities::iterator begin, Entities::iterator end, std::any any) {
     auto pair = std::any_cast<std::pair<size_t, std::reference_wrapper<al::ThreadPool>>>(any);

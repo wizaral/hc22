@@ -1,6 +1,3 @@
-#include <chrono>
-#include <random>
-
 #include "generator.hpp"
 
 Entities Generator0::generate(MemoryPool<bool> &memory_pool, size_t products_amount, size_t population_amount) {
