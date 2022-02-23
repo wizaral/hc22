@@ -5,6 +5,7 @@
 #include "population.hpp"
 
 #include "crossover.hpp"
+#include "examiner.hpp"
 #include "generator.hpp"
 #include "mutation.hpp"
 #include "profiler.hpp"
@@ -62,6 +63,11 @@ Population &Population::set_input_data(const char *file) {
 
 Population &Population::set_crossover(std::unique_ptr<Crossover> crossover) {
     m_crossover = std::move(crossover);
+    return *this;
+}
+
+Population &Population::set_examiner(std::unique_ptr<Examiner> examiner) {
+    m_examiner = std::move(examiner);
     return *this;
 }
 
@@ -131,7 +137,7 @@ std::string Population::generate_output_file_name(const char *name) {
 
 // ================================================================================================================== //
 
-void PopulationSingleCore0::algorithm(size_t population_amount, size_t iterations) {
+void Population0::algorithm(size_t population_amount, size_t iterations) {
     m_memory_pool.pool.resize(m_products.size() * population_amount);
     m_memory_pool.optional_size = population_amount;
 
@@ -140,7 +146,12 @@ void PopulationSingleCore0::algorithm(size_t population_amount, size_t iteration
     std::cout << "Start" << std::endl;
 
     for (size_t i = 0; i < iterations; ++i, ++m_age) {
-        examine();
+        m_examiner->examine(
+            m_entities.begin(),
+            m_entities.end(),
+            std::pair{std::ref(m_persons), std::ref(m_thread_pool)}
+        );
+
         sort(m_entities);
 
         std::cout << "Age: " << m_age << ". Best: " << m_entities.front().score() << '\n';
@@ -180,15 +191,9 @@ void PopulationSingleCore0::algorithm(size_t population_amount, size_t iteration
     print(m_entities.front());
 }
 
-void PopulationSingleCore0::examine() {
-    for (size_t i = 0, size = m_entities.size(); i < size; ++i) {
-        m_entities[i].examine(m_persons);
-    }
-}
-
 // ================================================================================================================== //
 
-void PopulationMultiCore0::algorithm(size_t population_amount, size_t iterations) {
+void Population1::algorithm(size_t population_amount, size_t iterations) {
     m_memory_pool.pool.resize(m_products.size() * population_amount);
     m_memory_pool.optional_size = population_amount;
 
@@ -197,7 +202,12 @@ void PopulationMultiCore0::algorithm(size_t population_amount, size_t iterations
     std::cout << "Start" << std::endl;
 
     for (size_t i = 0; i < iterations; ++i, ++m_age) {
-        examine();
+        m_examiner->examine(
+            m_entities.begin(),
+            m_entities.end(),
+            std::pair{std::ref(m_persons), std::ref(m_thread_pool)}
+        );
+
         sort(m_entities);
 
         std::cout << "Age: " << m_age << ". Best: " << m_entities.front().score() << '\n';
@@ -235,25 +245,6 @@ void PopulationMultiCore0::algorithm(size_t population_amount, size_t iterations
     }
 
     print(m_entities.front());
-}
-
-void PopulationMultiCore0::examine() {
-    auto size = m_entities.size();
-    auto shift = size / cores;
-
-    for (size_t i = shift; i < size; i += shift) {
-        m_thread_pool.add_task([i, shift, pers = std::cref(m_persons), ents = std::ref(m_entities)]() -> void {
-            for (auto j = i, end = i + shift; j < end; ++j) {
-                ents.get()[j].examine(pers);
-            }
-        });
-    }
-
-    for (size_t i = 0; i < shift; ++i) {
-        m_entities[i].examine(m_persons);
-    }
-
-    m_thread_pool.wait();
 }
 
 // ================================================================================================================== //

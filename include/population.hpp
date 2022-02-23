@@ -17,6 +17,7 @@ protected:
     uint64_t m_age = 0;
 
     std::unique_ptr<class Crossover> m_crossover;
+    std::unique_ptr<class Examiner> m_examiner;
     std::unique_ptr<class Generator> m_generator;
     std::unique_ptr<class Mutation> m_mutation;
 
@@ -39,14 +40,14 @@ public:
 
     Population &set_input_data(const char *file);
 
-    Population &set_crossover(std::unique_ptr<Crossover> crossover);
-    Population &set_generator(std::unique_ptr<Generator> generator);
-    Population &set_mutation(std::unique_ptr<Mutation> mutation);
+    Population &set_crossover(std::unique_ptr<class Crossover> crossover);
+    Population &set_examiner(std::unique_ptr<class Examiner> examiner);
+    Population &set_generator(std::unique_ptr<class Generator> generator);
+    Population &set_mutation(std::unique_ptr<class Mutation> mutation);
 
     virtual void algorithm(size_t population_amount, size_t iterations) = 0;
 
 protected:
-    virtual void examine() = 0;
     void print(const Entity &entity);
     void read_products(std::ifstream &file, std::array<int64_t, max_person_items> &products_list, size_t &id);
 
@@ -54,14 +55,12 @@ protected:
     static std::string generate_output_file_name(const char *name);
 };
 
-class PopulationSingleCore0 : public Population {
+class Population0 : public Population {
 public:
     void algorithm(size_t population_amount, size_t iterations) override;
-    void examine() override;
 };
 
-class PopulationMultiCore0 : public Population {
+class Population1 : public Population {
 public:
     void algorithm(size_t population_amount, size_t iterations) override;
-    void examine() override;
 };
