@@ -33,7 +33,7 @@ int main(int ac, char **av) try {
                 .set_examiner(std::make_unique<ExaminerMultiCore0>())
                 .set_generator(std::make_unique<Generator0>())
                 .set_mutation(std::make_unique<MutationSingleCore1>())
-                .algorithm(24'000, 100);
+                .algorithm(240'000, 10);
         }
     } else {
         std::cerr << "Usage: ./pizza" EXTENSION " [files ...]" << std::endl;

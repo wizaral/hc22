@@ -18,7 +18,7 @@ public:
     Entity() = default;
     Entity(const Products &products);
 
-    int score() const;
+    uint64_t score() const;
     void examine(const Persons &persons);
 
     friend void swap(Entity &a, Entity &b);

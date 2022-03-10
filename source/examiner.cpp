@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <execution>
 
 #include "examiner.hpp"
 
@@ -9,7 +10,7 @@ void ExaminerSingleCore0::examine(Entities::iterator begin, Entities::iterator e
     auto pair = std::any_cast<std::pair<std::reference_wrapper<Persons>, std::reference_wrapper<al::ThreadPool>>>(any);
     auto &persons = pair.first.get();
 
-    std::for_each(begin, end, [&persons](Entity &ent) {
+    std::for_each(std::execution::par_unseq, begin, end, [&persons](Entity &ent) {
         ent.examine(persons);
     });
 }
@@ -20,8 +21,8 @@ void ExaminerMultiCore0::examine(Entities::iterator begin, Entities::iterator en
     auto pair = std::any_cast<std::pair<std::reference_wrapper<Persons>, std::reference_wrapper<al::ThreadPool>>>(any);
     auto &persons = pair.first.get();
     auto &pool = pair.second.get();
-    auto size = std::distance(begin, end);
-    auto shift = size / cores;
+    size_t size = std::distance(begin, end);
+    size_t shift = size / cores;
 
     for (size_t i = shift; i < size; i += shift) {
         pool.add_task([i, shift, begin, pers = std::cref(persons)]() -> void {

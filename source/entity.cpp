@@ -5,7 +5,7 @@
 Entity::Entity(const Products &products)
 : products(products) {}
 
-int Entity::score() const {
+uint64_t Entity::score() const {
     return m_score;
 }
 

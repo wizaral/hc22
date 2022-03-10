@@ -42,7 +42,7 @@ public:
         return Access{m_value, m_mutex};
     }
 
-    const auto get() const {
+    auto get() const {
         return Access{m_value, m_mutex};
     }
 };

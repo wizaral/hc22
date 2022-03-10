@@ -1,3 +1,4 @@
+#include <execution>
 #include <fstream>
 #include <iostream>
 #include <numeric>
@@ -22,7 +23,8 @@ Population &Population::set_input_data(const char *file) {
     m_file = generate_output_file_name(file);
 
     if (std::ifstream ifile(file); ifile) {
-        size_t amount, id = 0;
+        size_t amount;
+        int32_t id = 0;
 
         ifile >> amount;
         m_persons.resize(amount);
@@ -95,7 +97,7 @@ void Population::print(const Entity &entity) {
     }
 }
 
-void Population::read_products(std::ifstream &file, std::array<int64_t, max_person_items> &products_list, size_t &id) {
+void Population::read_products(std::ifstream &file, ProductsList &products_list, int32_t &id) {
     std::string str;
     size_t amount;
     file >> amount;
@@ -115,7 +117,7 @@ void Population::read_products(std::ifstream &file, std::array<int64_t, max_pers
 }
 
 void Population::sort(Entities &entities) {
-    std::sort(entities.begin(), entities.end(), [](const auto &lhs, const auto &rhs) {
+    std::sort(std::execution::par_unseq, entities.begin(), entities.end(), [](const auto &lhs, const auto &rhs) {
         return lhs.score() > rhs.score();
     });
 }
@@ -199,6 +201,9 @@ void Population1::algorithm(size_t population_amount, size_t iterations) {
 
     m_entities = m_generator->generate(m_memory_pool, m_products.size(), population_amount);
 
+    auto adam = get_adam();
+    std::copy(adam.begin(), adam.end(), m_memory_pool.pool.begin());
+
     std::cout << "Start" << std::endl;
 
     for (size_t i = 0; i < iterations; ++i, ++m_age) {
@@ -245,6 +250,33 @@ void Population1::algorithm(size_t population_amount, size_t iterations) {
     }
 
     print(m_entities.front());
+}
+
+void Population1::analyze_products() {
+    for (auto &p : m_persons) {
+        for (auto i : p.favorite) {
+            auto val = static_cast<uint8_t>(m_products_state[i]);
+            m_products_state[i] = static_cast<Product>(val |= static_cast<uint8_t>(Product::Favorite));
+        }
+        for (auto i : p.disliked) {
+            auto val = static_cast<uint8_t>(m_products_state[i]);
+            m_products_state[i] = static_cast<Product>(val |= static_cast<uint8_t>(Product::Disliked));
+        }
+    }
+}
+
+std::vector<bool> Population1::get_adam() {
+    std::vector<bool> adam(m_products.size(), true);
+
+    m_products_state.resize(m_products.size());
+    analyze_products();
+
+    for (size_t i = 0, size = m_products_state.size(); i < size; ++i) {
+        if ((static_cast<uint8_t>(m_products_state[i]) & static_cast<uint8_t>(Product::Disliked))) {
+            adam[i] = false;
+        }
+    }
+    return adam;
 }
 
 // ================================================================================================================== //

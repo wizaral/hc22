@@ -17,7 +17,7 @@ void MutationSingleCore0::mutation(Entities::iterator begin, Entities::iterator 
 
 void MutationSingleCore1::mutation(Entities::iterator begin, Entities::iterator end, std::any any) {
     auto size = std::distance(begin, end);
-    std::uniform_int_distribution<> uid_local{0, size - 1 + (begin == end)};
+    std::uniform_int_distribution<> uid_local{0, static_cast<int>(size) - 1 + (begin == end)};
     static_cast<void>(any);
 
     for (size_t i = 0, amount = size / 1'000; i < amount; ++i) {
@@ -30,11 +30,11 @@ void MutationSingleCore1::mutation(Entities::iterator begin, Entities::iterator 
 
 void MutationMultiCore0::mutation(Entities::iterator begin, Entities::iterator end, std::any any) {
     auto &pool = std::any_cast<std::reference_wrapper<al::ThreadPool>>(any).get();
-    auto size = std::distance(begin, end);
-    auto shift = size / cores;
+    size_t size = std::distance(begin, end);
+    size_t shift = size / cores;
 
     for (size_t i = shift; i < size; i += shift) {
-        pool.add_task([i, shift, begin, end, this]() -> void {
+        pool.add_task([i, begin, end, this]() -> void {
             for (auto it = std::next(begin, i); it != end; ++it) {
                 std::shuffle(it->products.begin, it->products.end, mt.get().ref());
             }

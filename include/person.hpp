@@ -5,9 +5,11 @@
 
 inline constexpr auto max_person_items = 5;
 
+using ProductsList = std::array<int32_t, max_person_items>;
+
 struct Person {
-    std::array<int64_t, max_person_items> favorite{-1, -1, -1, -1, -1};
-    std::array<int64_t, max_person_items> disliked{-1, -1, -1, -1, -1};
+    ProductsList favorite{-1, -1, -1, -1, -1};
+    ProductsList disliked{-1, -1, -1, -1, -1};
 };
 
 using Persons = std::vector<Person>;
